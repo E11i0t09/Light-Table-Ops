@@ -193,6 +193,8 @@ function buildWx() {
         <div class="row" style="gap:6px"><span class="lbl d" style="font-size:10px">AVIATION WX</span><span class="lbl" style="font-size:10px">STATION LIST</span></div></div>
       <div class="hd"><div class="r2"><span class="lbl d" style="font-size:10px;line-height:12px">REPORTING<br>QNH HOME</span><b id="wvQ">----</b><span class="lbl d" style="font-size:10px;line-height:12px">VIS<br>KM</span><b id="wvV">--</b></div></div>
       <div class="stl" id="wvList"></div>
+      <div class="rawb" id="wvRaw"></div>
+      <div class="h2 dh"><span>SURFACE WIND</span><small>12 H TRACK</small></div>
       <div class="dia"><canvas id="cDia"></canvas></div>
     </div>
     <div class="r"><div class="cols" id="wvCols"></div>
@@ -212,13 +214,18 @@ function renderWx() {
       <span class="bars">${b(m.wspd || 0, 40, "var(--cy)")}${b((m.vis || 0), 10000, "var(--tx)")}${b(m.ceil == null ? 5000 : m.ceil, 5000, "var(--ye)")}${b((m.temp || 0) + 20, 50, "var(--or)")}</span></div>`; }).join("")
     : `<div class="micro" style="padding:8px 0">${hasLoc() ? "NO METAR STATIONS IN 300 KM" : "SET LOCATION FIRST"}</div>`;
   $("wvList").querySelectorAll(".st").forEach(el => el.addEventListener("click", () => { const i = +el.dataset.i; const s = MET.st.splice(i, 1)[0]; MET.st.unshift(s); renderWx(); }));
+  const sel = st[0];
+  $("wvRaw").innerHTML = sel ? `<div class="t"><span>RAW · <b>${sel.ic}</b></span><span>${esc(String(sel.name || "").toUpperCase()).slice(0, 18)}</span></div>
+    <div class="k">METAR</div><div class="m">${esc(sel.raw || "--")}</div>
+    <div class="k">TAF</div><div class="m">${sel.taf ? esc(sel.taf).replace(/\s(?=(BECMG|TEMPO|FM\d{6}|PROB\d{2})\b)/g, "<br>") : "NO TAF"}</div>` : "";
   const show = st.slice(0, STATE.mainW < 1100 ? 2 : 3);
   $("wvCols").style.setProperty("--n", Math.max(1, show.length));
+  $("wvCols").style.setProperty("--k", clamp(($("wvCols").clientHeight || 900) / 950, .85, 1.5).toFixed(3));
   $("wvCols").innerHTML = show.length ? show.map((s, i) => { const m = s.m;
     const rh = m.temp != null && m.dew != null ? Math.round(100 * Math.exp(17.625 * m.dew / (243.04 + m.dew)) / Math.exp(17.625 * m.temp / (243.04 + m.temp))) : null;
     return `<div class="sc"><div class="h"><span class="s">S${i + 1}</span><span><small>ICAO<br>CODE</small> <span class="ic">${s.ic}</span></span><span><small>DIST<br>${U.distU()}</small> <span class="km">${nf(U.dist(s.d), 0)}</span></span></div>
-      <svg class="fun" viewBox="-190 -8 380 178" id="fun${i}"></svg>
-      <div class="rings"><svg viewBox="-28 -28 56 56" id="rgA${i}"></svg><svg viewBox="-28 -28 56 56" id="rgB${i}"></svg></div>
+      <div class="fw" id="fw${i}"><svg class="fun" viewBox="-190 -8 380 178" id="fun${i}"></svg>
+      <div class="rings"><svg viewBox="-28 -28 56 56" id="rgA${i}"></svg><svg viewBox="-28 -28 56 56" id="rgB${i}"></svg></div></div>
       <div class="mid"><div class="kv"><span>TEMP</span><b>${m.temp != null ? m.temp + "°" : "--"}</b><span>DEWPT</span><b class="orange">${m.dew != null ? m.dew + "°" : "--"}</b><span>SPREAD</span><b>${m.temp != null && m.dew != null ? m.temp - m.dew : "--"}</b><span>CAT</span><b style="color:${CATCOL[m.cat] || "var(--tx)"}">${m.cat || "--"}</b></div>
         <div class="col"><canvas class="own" id="tdC${i}"></canvas></div>
         <div class="kv rt"><b>${m.qnh ? Math.round(m.qnh) : "--"}</b><span>QNH</span><b>${m.wspd != null ? m.wspd + (m.wgust ? "G" + m.wgust : "") : "--"}</b><span>KT</span><b class="${m.wgust ? "orange" : ""}">${m.wdir != null ? pad(m.wdir, 3) : (m.wspd ? "VRB" : "--")}</b><span>DIR</span><b>${m.vis != null ? (m.vis >= 9999 ? "10+" : nf(m.vis / 1000, 1)) : "--"}</b><span>VIS KM</span></div></div>
@@ -233,17 +240,21 @@ function renderWx() {
 BUS.on("metar", renderWx); BUS.on("wx", () => { if (STATE.view === "wx") renderWx(); });
 function drawStation(s, i) {
   const m = s.m, P = pal();
-  // Trichter = Wolkenschichten mit Höhenskala (0 … 8000 FT)
-  const TOP = 8000, Y = h => 160 - clamp(h / TOP, 0, 1) * 154;
-  let g = `<path d="M-160,0 H160 L136,100 L60,160 H-60 L-136,100 Z" fill="var(--bg3)" stroke="var(--cy)" stroke-width="2"/><path d="M-136,100 H136 M0,0 V160" stroke="var(--ln2)" stroke-width="1"/>`;
+  // Trichter = Wolkenschichten mit Höhenskala (0 … 8000 FT); Höhe passt sich der Box an
+  const fb = $("fw" + i), ar = fb && fb.clientWidth ? fb.clientHeight / fb.clientWidth : .47;
+  const VH = clamp(Math.round(380 * ar), 178, 640), B = VH - 18, A = Math.round(B * .625);
+  $("fun" + i).setAttribute("viewBox", `-190 -8 380 ${VH}`);
+  const TOP = 8000, Y = h => B - clamp(h / TOP, 0, 1) * (B - 6);
+  const hw = y => y <= A ? 160 - y * 24 / A : 136 - (y - A) * 76 / (B - A);
+  let g = `<path d="M-160,0 H160 L136,${A} L60,${B} H-60 L-136,${A} Z" fill="var(--bg3)" stroke="var(--cy)" stroke-width="2"/><path d="M-136,${A} H136 M0,0 V${B}" stroke="var(--ln2)" stroke-width="1"/>`;
   for (let h = 0; h <= TOP; h += 1000) { const y = Y(h); g += `<path d="M-188,${y} h${h % 2000 ? 5 : 10}" stroke="var(--ln2)"/>` + (h % 2000 ? "" : `<text x="-174" y="${y + 3}" font-size="8" fill="var(--dim)">${h ? h / 100 : "SFC"}</text>`); }
   const layers = m.cavok ? [] : m.clouds;
-  layers.slice(0, 4).forEach(cl => { const y = Y(cl.h == null ? 0 : cl.h), w = y > 100 ? 136 - (y - 100) * 1.27 : 160 - y * .24;
+  layers.slice(0, 4).forEach(cl => { const y = Y(cl.h == null ? 0 : cl.h), w = hw(y);
     const cov = { FEW: .25, SCT: .5, BKN: .78, OVC: 1, VV: 1 }[cl.c] || .3; const ww = (w - 26) * cov;
     g += `<rect x="${-ww}" y="${y - 3.5}" width="${ww * 2}" height="7" fill="${cl.t === "CB" || cl.t === "TCU" ? "var(--or)" : "var(--tx)"}" opacity=".85"/>
       <text x="${w - 8}" y="${y - 6}" font-size="9" fill="var(--dim)" text-anchor="end">${cl.c}${cl.h != null ? pad(cl.h / 100, 3) : ""}${cl.t || ""}</text>`; });
   if (m.ceil != null) { const y = Y(m.ceil); g += `<path d="M0,${y - 10} L13,${y} L0,${y + 10} L-13,${y} Z" fill="var(--or)"/>`; }
-  else g += `<path d="M0,60 L20,76 L0,92 L-20,76 Z" fill="none" stroke="var(--or)" stroke-width="2"/><text x="0" y="80" font-size="9" fill="var(--or)" text-anchor="middle">${m.cavok ? "OK" : "NSC"}</text>`;
+  else { const yc = B * .48; g += `<path d="M0,${yc - 16} L20,${yc} L0,${yc + 16} L-20,${yc} Z" fill="none" stroke="var(--or)" stroke-width="2"/><text x="0" y="${yc + 4}" font-size="9" fill="var(--or)" text-anchor="middle">${m.cavok ? "OK" : "NSC"}</text>`; }
   $("fun" + i).innerHTML = g;
   // Ringe: Wind-Richtung und Stärke
   const dirDot = m.wdir == null ? null : Math.round(m.wdir / 360 * 24) % 24;
@@ -305,13 +316,28 @@ function drawFc(cv) {
 /* Raute links: Wind am Ort als Richtungsraute */
 function drawDia() {
   const c = $("cDia"), f = c && fitCanvas(c); if (!f || !WX.d) return; const { x, W, H } = f, P = pal(), cw = WX.d.current;
-  const cx = W / 2, cy = H / 2, R = Math.min(W / 2 - 10, H / 2 - 10);
-  const pts = s => [[cx - R * s, cy], [cx, cy - R * .62 * s], [cx + R * s, cy], [cx, cy + R * .62 * s]];
+  const cx = W / 2, cy = (H - 16) / 2 + 4, R = Math.min(W / 2 - 16, (H - 30) / 2 / .62), q = .62, MAXW = 60;
+  const at = (deg, r) => { const a = deg * RAD; return [cx + Math.sin(a) * r, cy - Math.cos(a) * r * q]; };
+  const pts = s => [[cx - R * s, cy], [cx, cy - R * q * s], [cx + R * s, cy], [cx, cy + R * q * s]];
   [1, .72, .45].forEach((s, k) => { x.strokeStyle = k ? P.cy2 : P.cy; x.lineWidth = 1.2; x.beginPath(); pts(s).forEach((p, i) => i ? x.lineTo(...p) : x.moveTo(...p)); x.closePath(); x.stroke(); });
-  const a = cw.wind_direction_10m * RAD, L = R * clamp(cw.wind_speed_10m / 60, .15, 1);
-  x.strokeStyle = P.or; x.lineWidth = 2; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + Math.sin(a) * L, cy - Math.cos(a) * L * .62); x.stroke();
-  x.fillStyle = P.tx; x.font = "10px Oxanium"; x.textAlign = "center"; x.fillText(`${pad(Math.round(cw.wind_direction_10m), 3)}° · ${nf(U.wind(cw.wind_speed_10m), 0)} ${U.windU()} · G${nf(U.wind(cw.wind_gusts_10m), 0)}`, cx, H - 2); x.textAlign = "left";
-  for (let i = 0; i < 9; i++) { x.fillStyle = i % 3 ? P.ln2 : P.or; x.fillRect(cx - 2, 4 + i * 5, 3, 2); }
+  // Skala: Ringe = 20 / 40 / 60 km/h bzw. umgerechnet
+  x.font = "8px Oxanium"; x.fillStyle = P.dim; x.textAlign = "left";
+  [.45, .72, 1].forEach(s => x.fillText(nf(U.wind(MAXW * s), 0), cx + R * s + 3, cy - 2));
+  x.fillStyle = P.tx; x.font = "10px Oxanium"; x.textAlign = "center";
+  [["N", 0], ["E", 90], ["S", 180], ["W", 270]].forEach(([t, d]) => { const p = at(d, R + 9); x.fillText(t, p[0], p[1] + 4); });
+  // Verlauf der letzten 12 Stunden (älter = blasser)
+  const h = WX.d.hourly, i0 = hourIdx(), tr = [];
+  for (let k = 12; k >= 1; k--) { const j = i0 - k; if (j >= 0 && h.wind_direction_10m[j] != null) tr.push([h.wind_direction_10m[j], h.wind_speed_10m[j], k]); }
+  const pos = (d, v) => at(d, R * clamp(v / MAXW, .06, 1));
+  x.strokeStyle = hexA(P.ye, .35); x.lineWidth = 1; x.beginPath(); tr.forEach(([d, v], n) => { const p = pos(d, v); n ? x.lineTo(...p) : x.moveTo(...p); }); x.stroke();
+  tr.forEach(([d, v, k]) => { const p = pos(d, v); x.fillStyle = hexA(P.ye, .25 + .6 * (1 - k / 12)); x.beginPath(); x.arc(p[0], p[1], 2.4, 0, Math.PI * 2); x.fill(); });
+  // aktueller Wind
+  const e = pos(cw.wind_direction_10m, cw.wind_speed_10m), g = pos(cw.wind_direction_10m, cw.wind_gusts_10m);
+  x.strokeStyle = hexA(P.or, .5); x.setLineDash([3, 3]); x.beginPath(); x.moveTo(...e); x.lineTo(...g); x.stroke(); x.setLineDash([]);
+  x.strokeStyle = P.or; x.lineWidth = 2; x.beginPath(); x.moveTo(cx, cy); x.lineTo(...e); x.stroke();
+  x.fillStyle = P.or; x.beginPath(); x.arc(e[0], e[1], 3.5, 0, Math.PI * 2); x.fill();
+  x.fillStyle = P.tx; x.font = "11px Oxanium";
+  x.fillText(`${pad(Math.round(cw.wind_direction_10m), 3)}° · ${nf(U.wind(cw.wind_speed_10m), 0)} ${U.windU()} · G${nf(U.wind(cw.wind_gusts_10m), 0)}`, cx, Math.min(H - 2, cy + R * q + 30)); x.textAlign = "left";
 }
 
 /* ================== FLÜGE ================== */
