@@ -61,7 +61,15 @@ Without the sensor the wallpaper still works; thread tiles are then marked as si
 
 ### Browser demo
 
-[`demo/`](demo) runs the wallpaper in a normal browser for previews: live data for Edinburgh, simulated sensor values and placeholder icons. Add `?mode=full|half|strip&view=map|sys|wx|flt` and optionally `&proxy=<your adsb.php URL>`.
+**[▶ Open the live demo](https://e11i0t09.github.io/Light-Table-Ops/demo/)** – runs in any desktop browser: live data for Edinburgh, simulated sensor values and placeholder icons.
+
+| Layout | Map | System | Weather | Flights |
+|---|---|---|---|---|
+| Full | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=full&view=map) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=full&view=sys) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=full&view=wx) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=full&view=flt) |
+| Half | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=half&view=map) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=half&view=sys) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=half&view=wx) | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=half&view=flt) |
+| Strip | [▶](https://e11i0t09.github.io/Light-Table-Ops/demo/?mode=strip) | | | |
+
+Flight radar in the demo: append `&proxy=<your adsb.php URL>`. Source in [`demo/`](demo).
 
 ---
 
