@@ -13,6 +13,14 @@ $PS      = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell
 $Task    = 'Bridge-Ops-Sensor'
 $LhmVer  = '0.9.6'
 $LhmUrl  = "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/download/v$LhmVer/LibreHardwareMonitor.zip"
+# Fehler sichtbar machen (auch im Admin-Fenster, das sich sonst sofort schließt)
+trap {
+  Write-Host ''
+  Write-Host ((L 'FEHLER: ' 'ERROR: ') + $_.Exception.Message) -ForegroundColor Red
+  Write-Host ((L '  in Zeile ' '  at line ') + $_.InvocationInfo.ScriptLineNumber)
+  if ($Pause) { Read-Host (L 'Enter zum Schließen' 'Press Enter to close') | Out-Null }
+  exit 1
+}
 
 function Is-Admin { ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) }
 function Has-Task { [bool](Get-ScheduledTask -TaskName $Task -ErrorAction SilentlyContinue) }
@@ -84,6 +92,20 @@ if ($Install) {
     $set = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew
     Register-ScheduledTask -TaskName $Task -Action $act -Trigger $trg -Principal $prn -Settings $set -Description (L 'Bridge-Ops-Sensor (erweitert, Messwerte für das Wallpaper)' 'Bridge-Ops-Sensor (extended, readings for the wallpaper)') -Force | Out-Null
     Start-ScheduledTask -TaskName $Task
+    # prüfen, ob der Sensor wirklich läuft
+    $run = $false
+    for ($i = 0; $i -lt 10 -and -not $run; $i++) {
+      Start-Sleep -Seconds 1
+      $run = [bool](Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*Bridge-Ops-Sensor*Sensor.ps1*' })
+    }
+    $info = Get-ScheduledTaskInfo -TaskName $Task -ErrorAction SilentlyContinue
+    if ($run) { Write-Host (L 'Sensor läuft (Aufgabe gestartet).' 'Sensor is running (task started).') -ForegroundColor Green }
+    else {
+      Write-Host (L 'Sensor läuft NICHT.' 'Sensor is NOT running.') -ForegroundColor Red
+      if ($info) { Write-Host ((L '  Letztes Ergebnis der Aufgabe: 0x' '  Last task result: 0x') + ('{0:X}' -f $info.LastTaskResult)) }
+      $log = Join-Path $Dest 'sensor.log'
+      if (Test-Path $log) { Write-Host (L '  sensor.log:' '  sensor.log:'); Get-Content $log -Tail 15 | ForEach-Object { Write-Host ('    ' + $_) } }
+    }
     Write-Host ''
     Write-Host ((L 'Fertig (erweitert). Installiert in: ' 'Done (extended). Installed to: ') + $Dest)
     Write-Host (L 'Startet ab jetzt bei jeder Anmeldung über die Aufgabenplanung (Aufgabe "Bridge-Ops-Sensor"), ohne Abfrage.' 'Starts at every sign-in via Task Scheduler (task "Bridge-Ops-Sensor"), without a prompt.')

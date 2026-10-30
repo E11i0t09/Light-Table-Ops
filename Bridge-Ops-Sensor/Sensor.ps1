@@ -15,11 +15,16 @@
 param([int]$Port = 0, [switch]$Extended)
 
 $ErrorActionPreference = 'Stop'
-$Version = '2.1'
+$Version = '2.1.1'
 $script:UiDe = ((Get-UICulture).TwoLetterISOLanguageName -eq 'de')   # Sprache der Meldungen / message language
 function L([string]$textDe, [string]$textEn) { if ($script:UiDe) { $textDe } else { $textEn } }
 $Here    = Split-Path -Parent $MyInvocation.MyCommand.Path
 $OnWin   = ($env:OS -eq 'Windows_NT')
+# ---------- Protokoll (sensor.log im Programmordner, wird bei jedem Start neu angelegt) ----------
+$script:LogFile = Join-Path $Here 'sensor.log'
+function Log([string]$m) { try { Add-Content -Path $script:LogFile -Value ((Get-Date).ToString('yyyy-MM-dd HH:mm:ss') + '  ' + $m) -Encoding UTF8 } catch { } }
+try { Set-Content -Path $script:LogFile -Value '' -Encoding UTF8 } catch { }
+trap { Log ('FEHLER/ERROR: ' + $_.Exception.Message + ' @ ' + $_.InvocationInfo.ScriptLineNumber); continue }
 
 # ---------- Einstellungen (sensor.cfg: Port=47047) ----------
 if ($Port -le 0) {
@@ -30,11 +35,12 @@ if ($Port -le 0) {
   }
 }
 $OriginRx = '^https://[0-9a-f]{8,64}\.localhost$'
+Log ("Start v$Version  Port=$Port  Extended=$([bool]$Extended)  Admin=" + ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) + "  User=$env:USERNAME  PS=$($PSVersionTable.PSVersion)")
 
 # ---------- nur eine Instanz ----------
 $created = $false
 $mutex = New-Object System.Threading.Mutex($true, 'Local\BridgeOpsSensor', [ref]$created)
-if (-not $created) { exit 0 }
+if (-not $created) { Log 'Sensor läuft bereits (Mutex) – Ende. / already running – exit.'; exit 0 }
 
 # ---------- Laufwerke ----------
 $script:UsbLetters = @()
@@ -290,9 +296,9 @@ $script:Lhm = $null; $script:LhmMsg = ''; $script:LhmDir = Join-Path $Here 'lhm'
 function Init-Lhm {
   if (-not $Extended -or -not $OnWin) { $script:LhmMsg = 'off'; return }
   $dll = Join-Path $script:LhmDir 'LibreHardwareMonitorLib.dll'
-  if (-not (Test-Path $dll)) { $script:LhmMsg = 'lib missing'; return }
+  if (-not (Test-Path $dll)) { $script:LhmMsg = 'lib missing'; Log "LibreHardwareMonitor fehlt / missing: $dll"; return }
   $adm = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-  if (-not $adm) { $script:LhmMsg = 'no admin'; return }
+  if (-not $adm) { $script:LhmMsg = 'no admin'; Log 'Erweitert ohne Adminrechte / extended without admin rights'; return }
   try {
     # Abhängigkeiten aus dem lhm-Ordner laden, egal welche Version angefragt wird
     [AppDomain]::CurrentDomain.add_AssemblyResolve({
@@ -308,6 +314,7 @@ function Init-Lhm {
     $c.Open()
     $script:Lhm = $c; $script:LhmMsg = 'ok'
   } catch { $script:LhmMsg = 'error: ' + $_.Exception.Message; $script:Lhm = $null }
+  Log ('LibreHardwareMonitor: ' + $script:LhmMsg)
 }
 function Get-LhmCpu {
   if (-not $script:Lhm) { return $null }
@@ -413,6 +420,7 @@ function Sample {
 # ---------- Mini-HTTP-Server (nur 127.0.0.1) ----------
 $listener = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Loopback, $Port)
 try { $listener.Start() } catch {
+  Log "Port $Port belegt / in use"
   if ($OnWin) {
     Add-Type -AssemblyName System.Windows.Forms
     [void][System.Windows.Forms.MessageBox]::Show((L "Port $Port ist belegt.`nIn sensor.cfg einen anderen Port eintragen (und im Wallpaper-Assistenten)." "Port $Port is in use.`nSet another port in sensor.cfg (and in the wallpaper setup wizard)."), 'Bridge-Ops-Sensor')
@@ -454,8 +462,8 @@ function Serve-Pending {
 # ---------- Start ----------
 Init-Load
 Init-Extra
-Init-Lhm
 Sample
+Log 'Messung läuft / sampling'
 if ($OnWin) {
   Add-Type -AssemblyName System.Windows.Forms
   Add-Type -AssemblyName System.Drawing
@@ -472,7 +480,7 @@ if ($OnWin) {
   $tray = New-Object System.Windows.Forms.NotifyIcon
   $tray.Icon = $icon; $tray.Text = (L "Bridge-Ops-Sensor läuft (Port $Port)" "Bridge-Ops-Sensor running (port $Port)"); $tray.Visible = $true
   $menu = New-Object System.Windows.Forms.ContextMenuStrip
-  $i1 = $menu.Items.Add("Bridge-Ops-Sensor $Version · Port $Port"); $i1.Enabled = $false
+  $i1 = $menu.Items.Add("Bridge-Ops-Sensor $Version · Port $Port" + $(if ($Extended) { (L ' · erweitert' ' · extended') } else { '' })); $i1.Enabled = $false
   $i2 = $menu.Items.Add((L 'Netz: –' 'Net: –')); $i2.Enabled = $false
   $sepD = New-Object System.Windows.Forms.ToolStripSeparator; [void]$menu.Items.Add($sepD)
   $diskItems = New-Object System.Collections.ArrayList
@@ -498,6 +506,12 @@ if ($OnWin) {
   $tServe = New-Object System.Windows.Forms.Timer; $tServe.Interval = 50
   $tServe.add_Tick({ try { Serve-Pending } catch { } })
   $tSample.Start(); $tServe.Start()
+  Log 'Infobereich-Symbol aktiv / tray icon active'
+  if ($Extended) {
+    $tLhm = New-Object System.Windows.Forms.Timer; $tLhm.Interval = 1500
+    $tLhm.add_Tick({ $tLhm.Stop(); try { Init-Lhm } catch { Log ('LHM: ' + $_.Exception.Message) } })
+    $tLhm.Start()
+  }
   [System.Windows.Forms.Application]::Run()
   $tray.Visible = $false; $tray.Dispose()
 } else {
