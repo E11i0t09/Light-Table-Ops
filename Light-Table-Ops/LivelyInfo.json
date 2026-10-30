@@ -3,7 +3,7 @@
   "Title": "Light Table Ops",
   "Thumbnail": "thumbnail.jpg",
   "Preview": null,
-  "Desc": "Glass light-table console: map with UTMREF grid, flight radar (own ADS-B proxy), rain radar and weather warnings, METAR/TAF of the nearest stations, weather & forecast, system load per thread (optional Bridge-Ops-Sensor 2.0), network, audio. Click panels for details. Layout full / half / strip around your desktop icons.",
+  "Desc": "Glass light-table console: map with UTMREF grid, flight radar (own ADS-B proxy), rain radar and weather warnings, METAR/TAF of the nearest stations, weather & forecast, system load per thread (optional Bridge-Ops-Sensor 2.0), network, audio. Click panels for details. Layout full / half / strip around your desktop icons. Fan project inspired by the UI of the film Oblivion (2013, graphics by GMUNK) – not affiliated, all graphics redrawn.",
   "Author": "E11iot",
   "License": "CC BY-NC-ND 4.0 · see LICENSE.txt / LEGAL.txt",
   "Contact": "",
