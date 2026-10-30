@@ -256,21 +256,21 @@ body.narrowmain #mfoot .elev { width: 200px; }
 .sv .hd .node small { font-size: 8px; color: var(--dim); letter-spacing: 1px; line-height: 9px; }
 .sv .hd .node b { font-size: 38px; font-weight: 200; letter-spacing: 2px; line-height: 40px; }
 .sv .c1, .sv .c2, .sv .c3 { min-height: 0; display: flex; flex-direction: column; gap: 10px; position: relative; }
-.sv .gpu { flex: 1; min-height: 0; position: relative; }
+.sv .gpu { flex: 0 0 clamp(90px, 16%, 150px); min-height: 0; position: relative; }
 .sv .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .sv .chips span { border: 1px solid var(--ln2); border-radius: 4px; text-align: center; font-size: 11px; letter-spacing: 2px; padding: 5px 0; cursor: pointer; color: var(--dim); }
 .sv .chips span.on { background: var(--bg3); color: var(--tx); border-color: var(--tx); }
 .sv .hist { height: 96px; position: relative; }
 .sv .h2 { font-size: 12px; letter-spacing: 2px; display: flex; justify-content: space-between; border-top: 1px solid var(--ln); padding-top: 6px; }
 .sv .h2 small { font-size: 8px; color: var(--dim); }
-.sv .matrix { height: 70px; position: relative; }
+.sv .matrix { height: 70px; position: relative; flex: none; }
 .sv .fuel { display: grid; grid-template-columns: 1fr 52px; gap: 6px 10px; align-items: center; }
 .sv .fuel .b { height: 12px; display: flex; gap: 2px; }
 .sv .fuel .b i { flex: 1; background: var(--ln); }
 .sv .fuel .b i.on { background: var(--cy); } .sv .fuel .b i.hi { background: var(--ye); } .sv .fuel .b i.hot { background: var(--or); }
 .sv .fuel .n { font-size: 9px; letter-spacing: 1px; color: var(--dim); }
 .sv .fuel .n b { color: var(--tx); font-weight: 400; font-size: 11px; }
-.sv .pos { flex: 1; min-height: 120px; position: relative; }
+.sv .pos { flex: 1 1 0; min-height: 130px; position: relative; }
 .sv .procs { font-size: 10.5px; letter-spacing: .5px; }
 .sv .procs .r { display: grid; grid-template-columns: 1fr 48px 60px; gap: 6px; padding: 2px 0; border-bottom: 1px solid var(--ln); }
 .sv .procs .r b { font-weight: 400; color: var(--tx); text-align: right; }
@@ -449,7 +449,7 @@ body.bottomstrip[data-mode="stripx"] .pn { width: 290px; flex: none; }
 #side { grid-template-rows: minmax(0, 1fr); align-content: stretch; }
 
 body[data-mode="strip"] .p-mmap .cv, body[data-mode="stripx"] .p-mmap .cv { min-height: 150px; }
-.sv .gpuh { height: 110px; position: relative; flex: none; }
+.sv .gpuh { flex: 1 1 auto; min-height: 150px; position: relative; }
 .wv .sc .fun { width: 92%; max-width: 420px; height: 178px; margin-top: 6px; }
 .wv .sc .rings { top: 170px; }
 .wv .sc .mid { flex: none; }
@@ -461,3 +461,4 @@ body[data-mode="strip"] .p-mmap .cv, body[data-mode="stripx"] .p-mmap .cv { min-
 .wv .sc .dec .tx b { font-size: 14px; font-weight: 300; letter-spacing: 1.5px; color: var(--ye); }
 .wv .sc .dec .tx span { color: var(--cy); }
 .wv .sc .dec .tx i { font-style: normal; color: var(--tx); }
+.sv .c2 { overflow: hidden; } .sv .procs { flex: none; }
