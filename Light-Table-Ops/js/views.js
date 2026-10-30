@@ -106,16 +106,19 @@ function drawHist() {
 }
 function drawGpuHist() {
   const c = $("cGpuH"), f = c && fitCanvas(c); if (!f) return; const { x, W, H } = f, P = pal();
-  x.strokeStyle = P.ln; x.lineWidth = 1; for (let i = 1; i < 4; i++) { x.beginPath(); x.moveTo(0, H * i / 4 + .5); x.lineTo(W, H * i / 4 + .5); x.stroke(); }
+  x.strokeStyle = P.ln; x.lineWidth = 1; x.font = "8px Oxanium"; x.fillStyle = P.dim;
+  for (let i = 0; i <= 4; i++) { const y = Math.round(2 + (H - 6) * i / 4) + .5; x.beginPath(); x.moveTo(26, y); x.lineTo(W, y); x.stroke(); x.fillText(String(100 - i * 25), 2, y + 3); }
+  for (let i = 1; i < 10; i++) { const xx = Math.round(26 + (W - 26) * i / 10) + .5; x.strokeStyle = hexA(P.ln, .5); x.beginPath(); x.moveTo(xx, 2); x.lineTo(xx, H - 4); x.stroke(); }
+  x.save(); x.translate(26, 0); const Wd = W - 26;
   const o = { max: 100, n: HN };
-  spark(x, SYS.hist.gpu, 0, 2, W, H - 4, P.or, Object.assign({ fill: .15 }, o)); spark(x, SYS.hist.gpu, 0, 2, W, H - 4, P.or, Object.assign({ lw: 1.6 }, o));
-  spark(x, SYS.hist.gpuT, 0, 2, W, H - 4, P.ye, Object.assign({ lw: 1.4 }, o));
-  spark(x, SYS.hist.vram, 0, 2, W, H - 4, P.cy, Object.assign({ lw: 1.4 }, o));
+  spark(x, SYS.hist.gpu, 0, 2, Wd, H - 6, P.or, Object.assign({ fill: .15 }, o)); spark(x, SYS.hist.gpu, 0, 2, Wd, H - 6, P.or, Object.assign({ lw: 1.8 }, o));
+  spark(x, SYS.hist.gpuT, 0, 2, Wd, H - 6, P.ye, Object.assign({ lw: 1.6 }, o));
+  spark(x, SYS.hist.vram, 0, 2, Wd, H - 6, P.cy, Object.assign({ lw: 1.6 }, o)); x.restore();
   const last = a => a.length ? a[a.length - 1] : null, gt = last(SYS.hist.gpuT), vr = last(SYS.hist.vram);
-  x.font = "10px Oxanium"; x.textAlign = "right";
-  x.fillStyle = P.or; x.fillText(`${Math.round(SYS.gpu)} %`, W - 4, 12);
-  x.fillStyle = P.ye; x.fillText(gt ? `${Math.round(gt)} °C` : "-- °C", W - 54, 12);
-  x.fillStyle = P.cy; x.fillText(vr ? `${Math.round(vr)} % VRAM` : "VRAM --", W - 104, 12); x.textAlign = "left";
+  x.font = "13px Oxanium"; x.textAlign = "right";
+  x.fillStyle = P.or; x.fillText(`LOAD ${Math.round(SYS.gpu)} %`, W - 4, 16);
+  x.fillStyle = P.ye; x.fillText(gt ? `${Math.round(gt)} °C` : "-- °C", W - 100, 16);
+  x.fillStyle = P.cy; x.fillText(vr ? `VRAM ${Math.round(vr)} %` : "VRAM --", W - 166, 16); x.textAlign = "left";
 }
 function drawMatrix(cores) {
   const c = $("cMat"), f = c && fitCanvas(c); if (!f) return; const { x, W, H } = f, P = pal();
@@ -124,21 +127,35 @@ function drawMatrix(cores) {
     x.fillStyle = v > 85 ? P.or : v > 50 ? P.ye : v > 15 ? P.cy : P.ln; x.fillRect(k * cw + cw / 2 - 1.2, r * ch + ch / 2 - 1.2, 2.4, 2.4); } }
 }
 function drawPos(sd) {
+  // Zwei Rundinstrumente 0–100 °C (270°-Skala): außen CPU, innen GPU
   const c = $("cPos"), f = c && fitCanvas(c); if (!f) return; const { x, W, H } = f, P = pal();
-  const cx = W * .5, cy = H * .5, R = Math.min(W, H) * .42;
-  const temps = [["CPU", sd && sd.cpuTemp, P.tx], ["GPU", sd && sd.gpuTemp, P.ye]], cx2 = sd && sd.cpuX;
-  x.strokeStyle = P.ln2; x.lineWidth = 1; [1, .78].forEach(k => { x.beginPath(); x.arc(cx, cy, R * k, 0, Math.PI * 2); x.stroke(); });
-  temps.forEach(([k, v, col], i) => {
-    const r = R * (i ? .55 : .92), a = v == null ? 0 : clamp(v / 100, 0, 1);
-    x.strokeStyle = col; x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + a * Math.PI * 2); x.stroke();
-    const ex = cx + r * Math.cos(-Math.PI / 2 + a * Math.PI * 2), ey = cy + r * Math.sin(-Math.PI / 2 + a * Math.PI * 2);
-    x.fillStyle = col; x.beginPath(); x.arc(ex, ey, 3, 0, Math.PI * 2); x.fill();
-    x.font = "10px Oxanium"; x.fillStyle = P.dim; x.textAlign = i ? "left" : "right"; x.fillText(k, i ? W - 46 : 46, 14 + i * 0); x.fillStyle = col; x.font = "16px Oxanium";
-    x.fillText(v == null ? "--" : nf(v, 0) + "°", i ? W - 46 : 46, 32);
-    if (!i && cx2) { x.font = "9px Oxanium"; x.fillStyle = P.dim; if (cx2.power != null) x.fillText(nf(cx2.power, 0) + " W", 46, 46); if (cx2.clkMax) x.fillText(cx2.clkMax + " MHZ", 46, 58); }
-  });
-  x.strokeStyle = P.ye; x.beginPath(); x.arc(cx + R * .3, cy + R * .45, R * .28, 0, Math.PI * 2); x.stroke();
-  x.textAlign = "center"; x.font = "8px Oxanium"; x.fillStyle = P.dim; x.fillText(sd && sd.cpuTempSrc === "lhm" ? "CPU = LIBREHARDWAREMONITOR · PAWNIO" : sd && sd.cpuTempSrc === "acpi" ? "CPU = ACPI THERMAL ZONE" : (sd && sd.ext && sd.ext.on ? "CPU: " + String(sd.ext.msg || "").toUpperCase() : "CPU TEMP: SENSOR EXTENDED MODE"), cx, H - 4); x.textAlign = "left";
+  const cx = W * .5, cy = (H - 12) * .54, R = Math.min(W * .3, (H - 14) * .36), a0 = Math.PI * .75, sw = Math.PI * 1.5;
+  const cpu = sd && sd.cpuTemp, gpu = sd && sd.gpuTemp, cx2 = sd && sd.cpuX;
+  const col = v => v >= 85 ? P.or : v >= 70 ? P.ye : null;
+  const gauge = (r, v, base, lbl) => {
+    x.lineWidth = 6; x.strokeStyle = hexA(P.ln2, .6); x.beginPath(); x.arc(cx, cy, r, a0, a0 + sw); x.stroke();
+    x.lineWidth = 1; x.strokeStyle = hexA(P.or, .5); x.beginPath(); x.arc(cx, cy, r + 5, a0 + sw * .85, a0 + sw); x.stroke();   // Bereich > 85 °C
+    if (v != null) { const k = clamp(v / 100, 0, 1); x.lineWidth = 6; x.strokeStyle = col(v) || base; x.beginPath(); x.arc(cx, cy, r, a0, a0 + sw * k); x.stroke(); }
+  };
+  // Skala
+  x.strokeStyle = P.ln2; x.lineWidth = 1; x.font = "8px Oxanium"; x.fillStyle = P.dim; x.textAlign = "center";
+  for (let t = 0; t <= 100; t += 10) { const a = a0 + sw * t / 100, l = t % 50 ? 4 : 8;
+    x.beginPath(); x.moveTo(cx + (R + 9) * Math.cos(a), cy + (R + 9) * Math.sin(a)); x.lineTo(cx + (R + 9 + l) * Math.cos(a), cy + (R + 9 + l) * Math.sin(a)); x.stroke();
+    if (t === 0 || t === 100) x.fillText(String(t), cx + (R + 24) * Math.cos(a), cy + (R + 24) * Math.sin(a) + 3); }
+  gauge(R, cpu, P.tx, "CPU"); gauge(R * .74, gpu, P.ye, "GPU");
+  // Mitte: Werte
+  x.textAlign = "center"; x.font = `${Math.round(R * .3)}px Oxanium`; x.fillStyle = cpu == null ? P.dim : (col(cpu) || P.tx);
+  x.fillText(cpu == null ? "--" : nf(cpu, 0) + "°", cx, cy - R * .02);
+  x.font = `${Math.round(R * .19)}px Oxanium`; x.fillStyle = gpu == null ? P.dim : (col(gpu) || P.ye); x.fillText(gpu == null ? "GPU --" : "GPU " + nf(gpu, 0) + "°", cx, cy + R * .26);
+  x.font = "8px Oxanium"; x.fillStyle = P.dim; x.fillText("CPU °C", cx, cy - R * .34);
+  // Legende links oben, Leistung/Takt rechts oben
+  x.textAlign = "left"; x.font = "9px Oxanium"; x.lineWidth = 3;
+  [["CPU · OUTER RING", P.tx, cpu], ["GPU · INNER RING", P.ye, gpu]].forEach(([t, cl, v], i) => { const y = 10 + i * 13; x.strokeStyle = cl; x.globalAlpha = v == null ? .4 : 1;
+    x.beginPath(); x.moveTo(2, y - 3); x.lineTo(14, y - 3); x.stroke(); x.fillStyle = P.dim; x.fillText(t, 18, y); x.globalAlpha = 1; });
+  x.fillStyle = hexA(P.or, .8); x.fillText("━ > 85 °C", 2, 36);
+  if (cx2) { x.textAlign = "right"; x.fillStyle = P.dim; if (cx2.power != null) x.fillText("PKG " + nf(cx2.power, 0) + " W", W - 2, 10); if (cx2.clkMax) x.fillText("MAX " + cx2.clkMax + " MHZ", W - 2, 23); }
+  x.textAlign = "center";
+  x.fillText(sd && sd.cpuTempSrc === "lhm" ? "CPU = LIBREHARDWAREMONITOR · PAWNIO" : sd && sd.cpuTempSrc === "acpi" ? "CPU = ACPI THERMAL ZONE" : (sd && sd.ext && sd.ext.on ? "CPU: " + String(sd.ext.msg || "").toUpperCase() : "CPU TEMP: SENSOR EXTENDED MODE"), cx, H - 3); x.textAlign = "left";
 }
 /* GPU als Drahtgitter (eigene Strichgrafik einer Grafikkarte) */
 function drawGpu(sd) {
@@ -160,7 +177,7 @@ function drawGpu(sd) {
   });
   line([[150, -60, 4], [170, -60, 4], [170, 60, 4], [150, 60, 4]], hexA(P.cy, .6));   // Slotblech
   // Beschriftungen mit Linien
-  const lab = (p, dx, dy, txt) => { const q = iso(...p); x.strokeStyle = P.ln2; x.beginPath(); x.moveTo(q[0], q[1]); x.lineTo(q[0] + dx, q[1] + dy); x.lineTo(q[0] + dx + (dx > 0 ? 30 : -30), q[1] + dy); x.stroke();
+  const lab = (p, dx, dy, txt) => { const q = iso(...p); const k = Math.min(1, s * 1.5); dx *= k; dy *= k; x.strokeStyle = P.ln2; x.beginPath(); x.moveTo(q[0], q[1]); x.lineTo(q[0] + dx, q[1] + dy); x.lineTo(q[0] + dx + (dx > 0 ? 30 : -30), q[1] + dy); x.stroke();
     x.fillStyle = P.dim; x.font = "9px Oxanium"; x.textAlign = dx > 0 ? "left" : "right"; x.fillText(txt, q[0] + dx + (dx > 0 ? 34 : -34), q[1] + dy + 3); x.textAlign = "left"; };
   lab([95, 0, 49], 50, -60, `LOAD ${Math.round(SYS.gpu)} %`);
   lab([-95, 0, 49], -50, -50, sd && sd.gpuTemp != null ? `TEMP ${nf(sd.gpuTemp, 0)} °C` : "TEMP --");
