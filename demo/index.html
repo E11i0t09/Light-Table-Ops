@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Light Table Ops - browser demo</title>
+<!-- Light Table Ops · © 2026 E11iot · CC BY-NC-ND 4.0 · see LICENSE.txt / LEGAL.txt -->
+<link rel="stylesheet" href="../Light-Table-Ops/maplibre-gl.css">
+<link rel="stylesheet" href="../Light-Table-Ops/style.css">
+</head>
+<body class="booting">
+<div id="izone"></div>
+<div id="mapHost"><div id="map"></div><canvas id="mapOv"></canvas></div>
+<div id="console">
+  <div id="stage">
+    <header id="hdr"></header>
+    <div id="body">
+      <main id="main">
+        <div id="views">
+          <section class="view" id="vMap"></section>
+          <section class="view" id="vSys"></section>
+          <section class="view" id="vWx"></section>
+          <section class="view" id="vFlt"></section>
+        </div>
+        <footer id="mfoot"></footer>
+      </main>
+      <section id="dock"></section>
+      <aside id="side"></aside>
+    </div>
+  </div>
+</div>
+<div id="edit"></div>
+<div id="setup"></div>
+<div id="bootfx"></div>
+
+<script src="../Light-Table-Ops/maplibre-gl.js"></script>
+<script src="../Light-Table-Ops/apts.js"></script>
+<script src="../Light-Table-Ops/js/core.js"></script>
+<script src="demo.js"></script>
+<script src="../Light-Table-Ops/js/metar.js"></script>
+<script src="../Light-Table-Ops/js/data.js"></script>
+<script src="../Light-Table-Ops/js/gfx.js"></script>
+<script src="../Light-Table-Ops/js/side.js"></script>
+<script src="../Light-Table-Ops/js/mapview.js"></script>
+<script src="../Light-Table-Ops/js/views.js"></script>
+<script src="../Light-Table-Ops/js/dock.js"></script>
+<script src="../Light-Table-Ops/js/setup.js"></script>
+<script src="../Light-Table-Ops/js/main.js"></script>
+</body>
+</html>
