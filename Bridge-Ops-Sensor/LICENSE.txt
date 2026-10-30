@@ -1,0 +1,40 @@
+Bridge Ops (inkl. Flight Deck Ops, Touch Panel Ops, Bridge-Ops-Sensor, adsb.php)
+© 2026 E11iot – Lizenz: CC BY-NC-ND 4.0  ·  English version below
+
+Du darfst:
+- das Werk nutzen und unverändert weitergeben (kopieren, verbreiten), in jedem Format.
+
+Unter folgenden Bedingungen:
+- Namensnennung: "Bridge Ops von E11iot", ein Link zur Lizenz und diese Datei bleiben dabei.
+- Nicht kommerziell: kein Verkauf, keine Nutzung mit Gewinnabsicht.
+- Keine Bearbeitungen: Veränderte Versionen dürfen nicht veröffentlicht oder weitergegeben werden.
+  (Für dich selbst darfst du natürlich herumbasteln.)
+
+Nicht unter dieser Lizenz: Datenquellen, Karten und Schriften – dafür gelten die Lizenzen
+der jeweiligen Anbieter, siehe LEGAL.txt.
+
+Kurzfassung: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de
+Rechtsverbindlicher Text: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.de
+Ohne Gewähr – Details in LEGAL.txt.
+
+
+========================================================================
+
+Bridge Ops (incl. Flight Deck Ops, Touch Panel Ops, Bridge-Ops-Sensor, adsb.php)
+© 2026 E11iot – License: CC BY-NC-ND 4.0
+
+You may:
+- use the work and share it unchanged (copy, redistribute) in any medium or format.
+
+Under these terms:
+- Attribution: keep "Bridge Ops by E11iot", a link to the license and this file.
+- NonCommercial: no selling, no use for commercial gain.
+- NoDerivatives: modified versions may not be published or shared.
+  (Tinkering for yourself is of course fine.)
+
+Not covered by this license: data sources, maps and fonts – they are under their
+providers' own licenses, see LEGAL.txt.
+
+Summary: https://creativecommons.org/licenses/by-nc-nd/4.0/
+Legal code: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.en
+No warranty – details in LEGAL.txt.
