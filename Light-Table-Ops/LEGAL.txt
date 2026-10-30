@@ -1,0 +1,86 @@
+﻿Light Table Ops – Info / Rechtliches  ·  English version below
+===============================================================
+
+WAS IST DAS?
+- Ein animiertes Hintergrundbild im Stil eines Glas-Lichttischs aus dem Science-Fiction-Kino, ein
+  Fan-Projekt. Eigenständig neu gezeichnetes Design ohne Logos, Grafiken, Fotos oder Namen aus Filmen;
+  keine Verbindung zu Film-Studios oder Designern. Genannte Marken gehören ihren jeweiligen Inhabern.
+- Kostenlos. Weitergabe nur unentgeltlich, keine kommerzielle Nutzung – mehrere Datenquellen erlauben
+  nur nicht-kommerzielle Verwendung.
+
+KEINE GEWÄHR
+- Alle Daten werden ohne Gewähr angezeigt; sie können verspätet, unvollständig oder falsch sein.
+- Wetterwarnungen: Maßgeblich sind allein die amtlichen Warnungen des DWD (dwd.de, WarnWetter-App)
+  bzw. des jeweiligen nationalen Wetterdienstes.
+- METAR/TAF und Flugradar: NICHT für Flugvorbereitung, Navigation oder andere sicherheitsrelevante
+  Entscheidungen. Dafür nur offizielle Quellen nutzen.
+- CPU-Temperatur stammt aus der ACPI-Thermozone von Windows und ist nicht bei jedem Rechner die
+  echte Kerntemperatur.
+
+DATENSCHUTZ
+- Einstellungen werden nur lokal gespeichert (Browser-Speicher von Lively).
+- Zum Laden der Daten ruft dein Rechner die unten genannten Dienste direkt auf; diese sehen deine
+  IP-Adresse und die Koordinaten des gewählten Orts.
+- Flugdaten laufen über den eingetragenen ADS-B-Proxy (adsb.php); dessen Betreiber sieht IP-Adresse
+  und Koordinaten. Ohne Proxy-Eintrag entfällt das Flugradar.
+- Der optionale Bridge-Ops-Sensor ist nur auf diesem Rechner (127.0.0.1) erreichbar, antwortet nur
+  dem Wallpaper und sendet nichts ins Internet.
+
+DATENQUELLEN, KARTEN, SOFTWARE, SCHRIFTEN
+- Wetter, Ortssuche, Modellraster: Open-Meteo.com – CC BY 4.0, kostenlos nur nicht-kommerziell.
+- Luftqualität, UV, Pollen: Copernicus Atmosphere Monitoring Service (CAMS) über Open-Meteo –
+  enthält modifizierte Copernicus-Informationen.
+- METAR/TAF: MET Norway (api.met.no, NLOD 2.0 / CC BY 4.0), Rückfall aviationweather.gov (NOAA).
+- Regenradar: Weather data by RainViewer (rainviewer.com).
+- Wetterwarnungen, Warngebiete: Deutscher Wetterdienst (DWD), maps.dwd.de / opendata.dwd.de.
+- Vektorkarte: OpenFreeMap, © OpenMapTiles, Daten © OpenStreetMap-Mitwirkende (ODbL).
+- Satellitenbild (optional): Esri World Imagery (Esri, Maxar, Earthstar Geographics) – nur privat.
+- Küstenlinien der Minikarte: Natural Earth (gemeinfrei) über world-atlas / jsDelivr.
+- Flugplätze: OurAirports (gemeinfrei).
+- Flugdaten (über deinen Proxy): airplanes.live, adsb.lol (ODbL); Flugzeug/Route: hexdb.io, adsb.lol.
+- Kartendarstellung: MapLibre GL JS – BSD-3-Clause, siehe maplibre-LICENSE.txt.
+- Schrift: Oxanium von Severin Meyer – SIL Open Font License 1.1.
+
+
+===============================================================
+
+Light Table Ops – Info / Legal
+
+WHAT IS THIS?
+- An animated wallpaper in the style of a glass light table from science-fiction cinema, a fan
+  project. Independently redrawn design without logos, graphics, photos or names from any film;
+  not affiliated with any film studio or designer. Trademarks belong to their respective owners.
+- Free of charge. Share only for free, no commercial use – several data sources allow
+  non-commercial use only.
+
+NO WARRANTY
+- All data is shown without warranty and may be delayed, incomplete or wrong.
+- Weather warnings: only the official warnings of DWD or your national weather service count.
+- METAR/TAF and flight radar: NOT for flight planning, navigation or other safety-relevant
+  decisions. Use official sources only.
+- CPU temperature comes from the Windows ACPI thermal zone and is not the real core temperature
+  on every PC.
+
+PRIVACY
+- Settings are stored locally only (Lively's browser storage).
+- To load data your computer contacts the services below directly; they see your IP address and
+  the coordinates of the chosen place.
+- Flight data runs through the ADS-B proxy you enter (adsb.php); its operator sees IP address and
+  coordinates. Without a proxy there is no flight radar.
+- The optional Bridge-Ops-Sensor is only reachable on this computer (127.0.0.1), answers only the
+  wallpaper and sends nothing to the internet.
+
+DATA, MAPS, SOFTWARE, FONTS
+- Weather, place search, model grid: Open-Meteo.com – CC BY 4.0, free for non-commercial use only.
+- Air quality, UV, pollen: Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo –
+  contains modified Copernicus information.
+- METAR/TAF: MET Norway (api.met.no, NLOD 2.0 / CC BY 4.0), fallback aviationweather.gov (NOAA).
+- Rain radar: Weather data by RainViewer (rainviewer.com).
+- Weather warnings: Deutscher Wetterdienst (DWD), maps.dwd.de / opendata.dwd.de.
+- Vector map: OpenFreeMap, © OpenMapTiles, data © OpenStreetMap contributors (ODbL).
+- Satellite imagery (optional): Esri World Imagery (Esri, Maxar, Earthstar Geographics) – private use.
+- Mini map coastlines: Natural Earth (public domain) via world-atlas / jsDelivr.
+- Airfields: OurAirports (public domain).
+- Flight data (via your proxy): airplanes.live, adsb.lol (ODbL); aircraft/route: hexdb.io, adsb.lol.
+- Map rendering: MapLibre GL JS – BSD-3-Clause, see maplibre-LICENSE.txt.
+- Font: Oxanium by Severin Meyer – SIL Open Font License 1.1.

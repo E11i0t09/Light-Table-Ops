@@ -1,0 +1,53 @@
+﻿ADS-B-Proxy selbst hosten (für das Flugradar)  ·  English version below
+==============================================
+
+Warum? Die kostenlosen Flugdaten-Dienste (airplanes.live, adsb.lol) erlauben keinen
+direkten Abruf aus einem Wallpaper. adsb.php holt die Daten auf einem Webserver ab
+und reicht sie weiter. Ohne Proxy funktioniert alles außer dem Flugradar.
+
+Voraussetzungen
+- Webspace mit PHP (ab 5.4) und ausgehenden HTTPS-Verbindungen (curl oder allow_url_fopen)
+- Für englische DWD-Warntexte zusätzlich die PHP-Erweiterung ZipArchive (optional)
+
+Einrichten
+1. adsb.php per FTP auf den Webspace laden, z. B. https://example.de/adsb.php
+2. Im Browser aufrufen, z. B. .../adsb.php?lat=52.52&lon=13.40&dist=20 – die Antwort muss mit {"ac":[ beginnen.
+3. Im Wallpaper auf ⚙ klicken (Einrichtung) und die URL bei ADS-B-PROXY eintragen,
+   mit TESTEN prüfen, ÜBERNEHMEN.
+   Alternativ in Lively: Einstellung "ADS-B proxy URL".
+
+Hinweise
+- adsb.php legt neben sich einen Ordner adsb-cache an (Zwischenspeicher, 8 s bis 7 Tage,
+  aufgezeichnete Flugspuren 2 h).
+- Nutzungsbedingungen: airplanes.live und adsb.lol nur nicht-kommerziell. Wer adsb.php betreibt, ist selbst
+  für die Einhaltung der Bedingungen der Datenanbieter verantwortlich – am besten nur für sich selbst nutzen,
+  nicht als öffentlichen Proxy für andere.
+- Wer keinen Webspace hat: das Wallpaper ohne Flugradar nutzen (Mitte = LAGE).
+
+
+========================================================================
+
+Hosting the ADS-B proxy yourself (for the flight radar)
+=======================================================
+
+Why? The free flight data services (airplanes.live, adsb.lol) don't allow direct
+requests from a wallpaper. adsb.php fetches the data on a web server and passes it on.
+Without a proxy everything works except the flight radar.
+
+Requirements
+- Web space with PHP (5.4 or newer) and outgoing HTTPS (curl or allow_url_fopen)
+- For English DWD warning texts additionally the PHP extension ZipArchive (optional)
+
+Setup
+1. Upload adsb.php via FTP, e.g. https://example.com/adsb.php
+2. Open it in a browser, e.g. .../adsb.php?lat=52.52&lon=13.40&dist=20 – the response must start with {"ac":[
+3. In the wallpaper click ⚙ (setup), enter the URL under ADS-B PROXY,
+   check with TEST, then APPLY.
+   Alternatively in Lively: setting "ADS-B proxy URL".
+
+Notes
+- adsb.php creates a folder adsb-cache next to itself (cache, 8 s to 7 days,
+  recorded flight tracks 2 h).
+- Terms of use: airplanes.live and adsb.lol are non-commercial only. Whoever runs adsb.php is responsible
+  for complying with the data providers' terms – best use it just for yourself, not as a public proxy for others.
+- No web space? Use the wallpaper without the flight radar (center = SITUATION).

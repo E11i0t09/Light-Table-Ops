@@ -1,0 +1,14 @@
+{
+  "AppVersion": "2.0.6.1",
+  "Title": "Light Table Ops",
+  "Thumbnail": "thumbnail.jpg",
+  "Preview": null,
+  "Desc": "Glass light-table console: map with UTMREF grid, flight radar (own ADS-B proxy), rain radar and weather warnings, METAR/TAF of the nearest stations, weather & forecast, system load per thread (optional Bridge-Ops-Sensor 2.0), network, audio. Click panels for details. Layout full / half / strip around your desktop icons.",
+  "Author": "E11iot",
+  "License": "CC BY-NC-ND 4.0 · see LICENSE.txt / LEGAL.txt",
+  "Contact": "",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": "--system-information --audio --pause-event true",
+  "IsAbsolutePath": false
+}
