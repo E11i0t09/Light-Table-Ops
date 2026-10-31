@@ -11,12 +11,12 @@ function seg(k, opts) { return `<span class="seg">${opts.map(([v, l]) => `<span 
 function renderSetup() {
   const el = $("setup");
   el.innerHTML = `<div class="sb"><h2><span class="ic">${ICON.logo}</span>LIGHT TABLE OPS · SETUP</h2><div class="g">
-    <div class="k">LOCATION</div><div><div class="r"><input id="suQ" placeholder="SEARCH PLACE …" spellcheck="false"><span class="btn" id="suGo">SEARCH</span></div>
-      <div class="hint">${SU.lat == null ? "<span class='bad'>NO LOCATION YET – SEARCH AND PICK ONE</span>" : `CURRENT: <b>${esc(String(SU.name).toUpperCase())}</b> · ${nf(SU.lat, 3)}, ${nf(SU.lon, 3)}`}</div>
+    <div class="k">LOCATION</div><div>${IS_WE ? `<div class="hint">WALLPAPER ENGINE → PROPERTIES → <b>PLACE</b></div>` : `<div class="r"><input id="suQ" placeholder="SEARCH PLACE …" spellcheck="false"><span class="btn" id="suGo">SEARCH</span></div>`}
+      <div class="hint">${SU.lat == null ? (IS_WE ? "<span class='bad'>NO LOCATION YET – ENTER A PLACE IN THE PROPERTIES</span>" : "<span class='bad'>NO LOCATION YET – SEARCH AND PICK ONE</span>") : `CURRENT: <b>${esc(String(SU.name).toUpperCase())}</b> · ${nf(SU.lat, 3)}, ${nf(SU.lon, 3)}`}</div>
       <div class="res" id="suRes">${SU.res.map((r, i) => `<div data-i="${i}">${esc(r.name)} <span class="dim">${esc(r.admin)} · ${nf(r.lat, 2)}, ${nf(r.lon, 2)}</span></div>`).join("")}</div></div>
-    <div class="k">ADS-B PROXY</div><div><div class="r"><input id="suP" value="${esc(SU.adsbProxy)}" placeholder="https://…/adsb.php" spellcheck="false"><span class="btn" id="suPT">TEST</span></div>
+    <div class="k">ADS-B PROXY</div><div><div class="r">${IS_WE ? `<span class="wev">${SU.adsbProxy ? esc(SU.adsbProxy) : "<span class='dim'>NOT SET</span>"}</span>` : `<input id="suP" value="${esc(SU.adsbProxy)}" placeholder="https://…/adsb.php" spellcheck="false">`}<span class="btn" id="suPT">TEST</span></div>${IS_WE ? `<div class="hint">WALLPAPER ENGINE → PROPERTIES → <b>ADS-B PROXY URL</b></div>` : ""}
       <div class="hint" id="suPR">EMPTY = NO FLIGHT RADAR. HOST adsb.php YOURSELF (SEE PROXY-HOSTING.txt).</div></div>
-    <div class="k">SENSOR</div><div><div class="r"><input id="suS" value="${SU.sensorPort}" style="width:120px" spellcheck="false"><span class="btn" id="suST">TEST</span></div>
+    <div class="k">SENSOR</div><div><div class="r">${IS_WE ? `<span class="wev">PORT ${SU.sensorPort}</span>` : `<input id="suS" value="${SU.sensorPort}" style="width:120px" spellcheck="false">`}<span class="btn" id="suST">TEST</span></div>${IS_WE ? `<div class="hint">WALLPAPER ENGINE → PROPERTIES → <b>SENSOR KEY</b> (TRAY ICON → COPY WALLPAPER ENGINE KEY) · <b>SENSOR PORT</b></div>` : ""}
       <div class="hint" id="suSR">BRIDGE-OPS-SENSOR 2.0 (WINDOWS, OPTIONAL) – THREADS, PROCESSES, DRIVES, TEMPERATURES.</div></div>
     <div class="k">RANGE</div><div class="r">${seg("range", [[50, "50"], [100, "100"], [150, "150"], [180, "180 KM"]])}</div>
     <div class="k">UNITS</div><div>${seg("units", [["avi", "AVIATION · KT FT"], ["met", "METRIC · KM/H M"]])}</div>
@@ -25,16 +25,16 @@ function renderSetup() {
     <div class="k">ICONS</div><div>${seg("iconSide", [["left", "LEFT"], ["right", "RIGHT"]])} &nbsp; ${seg("iconCols", [[0, "0"], [1, "1"], [2, "2"], [3, "3"], [4, "4"]])} <span class="dim">COLUMNS</span>
       <div class="hint">FINE-TUNE: ✎ EDIT LAYOUT (DRAG THE HANDLES) OR THE ${HOST} ${IS_WE ? "PROPERTIES" : "SETTINGS"}.</div></div>
     </div>
-    <div class="hint" style="margin-top:14px">IF THE KEYBOARD DOES NOT REACH THE WALLPAPER, ENTER PLACE AND PROXY IN THE ${IS_WE ? "WALLPAPER ENGINE PROPERTIES" : "LIVELY SETTINGS (CUSTOMISE)"}.</div>
+    <div class="hint" style="margin-top:14px">${IS_WE ? "WALLPAPER ENGINE DOES NOT PASS THE KEYBOARD TO WALLPAPERS – TEXT SETTINGS ARE IN ITS PROPERTIES PANEL." : "IF THE KEYBOARD DOES NOT REACH THE WALLPAPER, ENTER PLACE AND PROXY IN THE LIVELY SETTINGS (CUSTOMISE)."}</div>
     <div class="foot"><span class="btn" id="suEd">✎ EDIT LAYOUT</span><span style="flex:1"></span><span class="btn" id="suC">CANCEL</span><span class="btn or" id="suOk">APPLY</span></div></div>`;
   el.querySelectorAll("[data-k]").forEach(s => s.onclick = () => { const k = s.dataset.k; SU[k] = typeof CFG[k] === "number" ? +s.dataset.v : s.dataset.v; keepInputs(); renderSetup(); });
   const search = async () => { const q = $("suQ").value.trim(); if (!q) return; keepInputs(); try { SU.res = await geocode(q); } catch (e) { SU.res = []; } renderSetup(); };
-  $("suGo").onclick = search; $("suQ").onkeydown = e => { if (e.key === "Enter") search(); };
+  if ($("suGo")) { $("suGo").onclick = search; $("suQ").onkeydown = e => { if (e.key === "Enter") search(); }; }
   el.querySelectorAll("#suRes [data-i]").forEach(d => d.onclick = () => { const r = SU.res[+d.dataset.i]; Object.assign(SU, { name: r.name, lat: r.lat, lon: r.lon, res: [] }); keepInputs(); renderSetup(); });
-  $("suPT").onclick = async () => { const u = $("suP").value.trim(), out = $("suPR"); if (!u) { out.textContent = "EMPTY"; return; } out.textContent = "TESTING …";
+  $("suPT").onclick = async () => { const u = ($("suP") ? $("suP").value : SU.adsbProxy || "").trim(), out = $("suPR"); if (!u) { out.textContent = "EMPTY"; return; } out.textContent = "TESTING …";
     try { const j = await getJSON(`${u}${u.includes("?") ? "&" : "?"}lat=${SU.lat ?? 52.52}&lon=${SU.lon ?? 13.4}&dist=20`); out.innerHTML = Array.isArray(j.ac) ? `<span class="ok">OK · ${j.ac.length} AIRCRAFT · ${esc(j.src || "")}</span>` : "<span class='bad'>UNEXPECTED ANSWER</span>"; }
     catch (e) { out.innerHTML = "<span class='bad'>NO ANSWER (URL / CORS?)</span>"; } };
-  $("suST").onclick = async () => { const p = +$("suS").value || 47047, out = $("suSR"); out.textContent = "TESTING …";
+  $("suST").onclick = async () => { const p = +($("suS") ? $("suS").value : SU.sensorPort) || 47047, out = $("suSR"); out.textContent = "TESTING …";
     try { const r = await fetch(`http://127.0.0.1:${p}/`, { cache: "no-store" }); if (r.status === 403) { out.innerHTML = (IS_WE ? "<span class='bad'>SENSOR KEY MISSING OR WRONG – TRAY ICON → COPY WALLPAPER ENGINE KEY</span>" : "<span class='bad'>ACCESS DENIED – UPDATE LIVELY</span>"); return; }
       const j = await r.json(); out.innerHTML = `<span class="ok">CONNECTED · V${esc(j.ver)}${Array.isArray(j.cores) ? " · " + j.cores.length + " THREADS" : " · UPDATE TO 2.0 FOR THREADS"}</span>`; }
     catch (e) { out.innerHTML = "<span class='bad'>NOT RUNNING ON THIS PORT</span>"; } };

@@ -28,11 +28,11 @@ const CFG = {
   layout: "full", stripSide: "right", stripW: 300, iconSide: "left", iconCols: 2, iconCellW: 118, iconCellH: 93,
   taskbar: 2.8, iconGrid: false, zoneFrame: true, zoneAdj: 0, inset: { l: 0, r: 0, t: 0, b: 0 },
   startView: "map", mapStyle: "vector", range: 100, ui: 100, dim: 100, nightMode: "auto", nightLvl: 60,
-  anim: 60, fps: 30, boot: true
+  anim: 60, fps: 30, boot: true, hatch: true
 };
 const COMMON = ["name", "lat", "lon", "adsbProxy", "sensorPort", "units"];
 const PER = ["layout", "stripSide", "stripW", "iconSide", "iconCols", "iconCellW", "iconCellH", "taskbar", "iconGrid", "zoneFrame", "zoneAdj",
-  "inset", "startView", "mapStyle", "range", "ui", "dim", "nightMode", "nightLvl", "anim", "fps", "boot"];
+  "inset", "startView", "mapStyle", "range", "ui", "dim", "nightMode", "nightLvl", "anim", "fps", "boot", "hatch"];
 let SETUP_DONE = false;
 function loadCfg() {
   const c = LS.get("lto-common", null), p = LS.get("lto-scr-" + SCR, null);

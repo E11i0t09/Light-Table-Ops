@@ -136,22 +136,18 @@ function drawOverlay(t) {
   const x = c.getContext("2d"), r = c._r || 1, W = c.width / r, H = c.height / r, P = pal();
   x.setTransform(r, 0, 0, r, 0, 0); x.clearRect(0, 0, W, H);
   const home = m.project([CFG.lon, CFG.lat]), kpp = kmPerPx(), Rpx = CFG.range / kpp;
-  // 1) Schraffur: getreppter Rahmen am Kartenrand wie im Original; Form wechselt je Zoomstufe
-  const B = clamp(Math.round(H / 24), 14, 46), nx = Math.ceil(W / B), ny = Math.ceil(H / B), seed = Math.round(m.getZoom()) * 977 + 13;
-  if (!HATCH || HATCH._r !== r) { HATCH = hatchPattern(x, 1); HATCH._r = r; }
-  const nz = k => { const v = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453; return v - Math.floor(v); };
-  const run = (edge, k) => Math.floor(k / (2 + Math.floor(3 * nz(edge * 13 + Math.floor(k / 6)))));   // Stufenlänge 2–4 Blöcke
-  const off = (edge, k) => 1 + Math.floor(4.8 * nz(run(edge, k) * 7 + edge * 101));                   // Randbreite 1–5 Blöcke
-  const isOut = (i, j) => i < off(0, j) || i >= nx - off(1, j) || j < off(2, i) || j >= ny - off(3, i);
-  x.fillStyle = HATCH; x.beginPath();
-  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) if (isOut(i, j)) x.rect(i * B, j * B, B, B);
-  x.fill();
-  // äußere Kerben: am Kartenrand stellenweise dunkler Hintergrund statt Schraffur
-  const oo = (edge, k) => { const v = nz(Math.floor(k / 3) * 11 + edge * 57 + 5); return v > .8 ? 2 : (v > .58 ? 1 : 0); };
-  x.fillStyle = "#111416"; x.beginPath();
-  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++)
-    if ((j < oo(2, i) || ny - 1 - j < oo(3, i) || i < oo(0, j) || nx - 1 - i < oo(1, j)) && isOut(i, j)) x.rect(i * B, j * B, B, B);
-  x.fill();
+  // 1) Schraffur: getreppter Rahmen am Kartenrand wie im Original; Form wechselt je Zoomstufe, außen lückenlos bis zum Rand
+  if (CFG.hatch !== false) {
+    const B = clamp(Math.round(H / 24), 14, 46), nx = Math.ceil(W / B), ny = Math.ceil(H / B), seed = Math.round(m.getZoom()) * 977 + 13;
+    if (!HATCH || HATCH._r !== r) { HATCH = hatchPattern(x, 1); HATCH._r = r; }
+    const nz = k => { const v = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453; return v - Math.floor(v); };
+    const run = (edge, k) => Math.floor(k / (2 + Math.floor(3 * nz(edge * 13 + Math.floor(k / 6)))));   // Stufenlänge 2–4 Blöcke
+    const off = (edge, k) => 1 + Math.floor(4.8 * nz(run(edge, k) * 7 + edge * 101));                   // Randbreite 1–5 Blöcke
+    const isOut = (i, j) => i < off(0, j) || i >= nx - off(1, j) || j < off(2, i) || j >= ny - off(3, i);
+    x.fillStyle = HATCH; x.beginPath();
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) if (isOut(i, j)) x.rect(i * B, j * B, B, B);
+    x.fill();
+  }
   // 2) UTMREF-Raster
   if (MAP.gridOn) drawUtmGrid(x, W, H, kpp);
   // 3) Ort

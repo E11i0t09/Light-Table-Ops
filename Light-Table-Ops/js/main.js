@@ -89,6 +89,7 @@ function livelyPropertyListener(name, val) {
     case "anim": CFG.anim = clamp(+val, 0, 100); saveCfg(); applyAnim(); if ($("swAnim")) updCmd(); return;
     case "fps": CFG.fps = clamp(+val || 30, 5, 60); saveCfg(); return;
     case "boot": CFG.boot = !!val; saveCfg(); return;
+    case "hatch": CFG.hatch = !!val; saveCfg(); MAP.dirty = true; return;
     case "iconGrid": case "zoneFrame": CFG[name] = !!val; break;
     case "stripSide": case "iconSide": CFG[name] = val; break;
     case "stripW": case "iconCols": case "iconCellW": case "iconCellH": case "taskbar": case "ui": CFG[name] = +val; break;
