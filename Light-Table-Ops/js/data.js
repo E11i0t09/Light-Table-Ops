@@ -4,7 +4,7 @@
 
 /* Status aller Quellen für DATALINKS */
 const LINKS = {
-  lively: { n: "LIVELY SYSTEM", ok: false, t: 0 }, sensor: { n: "BRIDGE-OPS-SENSOR", ok: false, t: 0 },
+  lively: { n: HOST + " SYSTEM", ok: false, t: 0 }, sensor: { n: "BRIDGE-OPS-SENSOR", ok: false, t: 0 },
   wx: { n: "OPEN-METEO", ok: false, t: 0 }, aq: { n: "CAMS AIR QUALITY", ok: false, t: 0 },
   metar: { n: "METAR / TAF", ok: false, t: 0 }, adsb: { n: "ADS-B PROXY", ok: false, t: 0 },
   rain: { n: "RAINVIEWER", ok: false, t: 0 }, dwd: { n: "DWD WARNINGS", ok: false, t: 0 }, grid: { n: "SYNOPTIC GRID", ok: false, t: 0 }
@@ -45,7 +45,7 @@ async function pollSensor() {
   if (paused) { SENS.timer = setTimeout(pollSensor, 2000); return; }
   try {
     const r = await fetch(`http://127.0.0.1:${CFG.sensorPort}/`, { cache: "no-store" });
-    if (r.status === 403) { SENS.ok = false; SENS.denied = true; link("sensor", false, "ACCESS DENIED"); }
+    if (r.status === 403) { SENS.ok = false; SENS.denied = true; link("sensor", false, IS_WE ? "KEY MISSING" : "ACCESS DENIED"); }
     else {
       const j = await r.json();
       if (j && j.app === "Bridge-Ops-Sensor") {

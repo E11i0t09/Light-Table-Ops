@@ -23,9 +23,9 @@ function renderSetup() {
     <div class="k">MAP</div><div>${seg("mapStyle", [["vector", "VECTOR DARK"], ["sat", "SATELLITE"]])}<div class="hint">SATELLITE: ESRI WORLD IMAGERY – PRIVATE USE ONLY.</div></div>
     <div class="k">LAYOUT</div><div>${seg("layout", [["full", "FULL"], ["half", "HALF"], ["strip", "STRIP"]])} &nbsp; ${seg("stripSide", [["right", "STRIP RIGHT"], ["left", "LEFT"], ["bottom", "BOTTOM"]])}</div>
     <div class="k">ICONS</div><div>${seg("iconSide", [["left", "LEFT"], ["right", "RIGHT"]])} &nbsp; ${seg("iconCols", [[0, "0"], [1, "1"], [2, "2"], [3, "3"], [4, "4"]])} <span class="dim">COLUMNS</span>
-      <div class="hint">FINE-TUNE: ✎ EDIT LAYOUT (DRAG THE HANDLES) OR THE LIVELY SETTINGS.</div></div>
+      <div class="hint">FINE-TUNE: ✎ EDIT LAYOUT (DRAG THE HANDLES) OR THE ${HOST} ${IS_WE ? "PROPERTIES" : "SETTINGS"}.</div></div>
     </div>
-    <div class="hint" style="margin-top:14px">IF THE KEYBOARD DOES NOT REACH THE WALLPAPER, ENTER PLACE AND PROXY IN THE LIVELY SETTINGS (CUSTOMISE).</div>
+    <div class="hint" style="margin-top:14px">IF THE KEYBOARD DOES NOT REACH THE WALLPAPER, ENTER PLACE AND PROXY IN THE ${IS_WE ? "WALLPAPER ENGINE PROPERTIES" : "LIVELY SETTINGS (CUSTOMISE)"}.</div>
     <div class="foot"><span class="btn" id="suEd">✎ EDIT LAYOUT</span><span style="flex:1"></span><span class="btn" id="suC">CANCEL</span><span class="btn or" id="suOk">APPLY</span></div></div>`;
   el.querySelectorAll("[data-k]").forEach(s => s.onclick = () => { const k = s.dataset.k; SU[k] = typeof CFG[k] === "number" ? +s.dataset.v : s.dataset.v; keepInputs(); renderSetup(); });
   const search = async () => { const q = $("suQ").value.trim(); if (!q) return; keepInputs(); try { SU.res = await geocode(q); } catch (e) { SU.res = []; } renderSetup(); };
@@ -35,7 +35,7 @@ function renderSetup() {
     try { const j = await getJSON(`${u}${u.includes("?") ? "&" : "?"}lat=${SU.lat ?? 52.52}&lon=${SU.lon ?? 13.4}&dist=20`); out.innerHTML = Array.isArray(j.ac) ? `<span class="ok">OK · ${j.ac.length} AIRCRAFT · ${esc(j.src || "")}</span>` : "<span class='bad'>UNEXPECTED ANSWER</span>"; }
     catch (e) { out.innerHTML = "<span class='bad'>NO ANSWER (URL / CORS?)</span>"; } };
   $("suST").onclick = async () => { const p = +$("suS").value || 47047, out = $("suSR"); out.textContent = "TESTING …";
-    try { const r = await fetch(`http://127.0.0.1:${p}/`, { cache: "no-store" }); if (r.status === 403) { out.innerHTML = "<span class='bad'>ACCESS DENIED – UPDATE LIVELY</span>"; return; }
+    try { const r = await fetch(`http://127.0.0.1:${p}/`, { cache: "no-store" }); if (r.status === 403) { out.innerHTML = (IS_WE ? "<span class='bad'>SENSOR KEY MISSING OR WRONG – TRAY ICON → COPY WALLPAPER ENGINE KEY</span>" : "<span class='bad'>ACCESS DENIED – UPDATE LIVELY</span>"); return; }
       const j = await r.json(); out.innerHTML = `<span class="ok">CONNECTED · V${esc(j.ver)}${Array.isArray(j.cores) ? " · " + j.cores.length + " THREADS" : " · UPDATE TO 2.0 FOR THREADS"}</span>`; }
     catch (e) { out.innerHTML = "<span class='bad'>NOT RUNNING ON THIS PORT</span>"; } };
   $("suC").onclick = () => { $("setup").classList.remove("on"); };

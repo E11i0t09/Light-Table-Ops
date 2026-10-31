@@ -97,7 +97,7 @@ function dNet(c) {
       <div class="card"><div class="ct"><span>▲ UPLOAD</span></div><div class="big" style="font-size:30px" id="dnU">${fmtRate(SYS.up)}</div></div>
       <div class="card"><div class="ct"><span>SESSION</span></div><div class="lbl">▼ ${fmtVol(SYS.sess.down)}<br>▲ ${fmtVol(SYS.sess.up)}</div></div></div>
     <div class="card" style="flex:1;min-height:160px;display:flex;flex-direction:column"><div class="ct"><span>THROUGHPUT · 10 MIN</span><span><span class="orange">━</span> DL <span class="cyan">━</span> UL</span></div><div style="flex:1;position:relative"><canvas id="dnC"></canvas></div></div>
-    <div class="card"><div class="ct"><span>ADAPTERS</span><span>${nics.length ? "SENSOR" : "LIVELY"}</span></div><div class="lst">${(nics.length ? nics : [{ name: SYS.netName || "--", down: SYS.down, up: SYS.up, auto: true }]).map(n => `<div class="r" style="grid-template-columns:1fr 110px 110px"><span>${n.auto ? "<b class='orange'>● </b>" : ""}${esc(String(n.name).toUpperCase())}</span><span>▼ ${fmtRate(n.down)}</span><span>▲ ${fmtRate(n.up)}</span></div>`).join("")}</div></div></div>`;
+    <div class="card"><div class="ct"><span>ADAPTERS</span><span>${nics.length ? "SENSOR" : HOST_S}</span></div><div class="lst">${(nics.length ? nics : [{ name: SYS.netName || "--", down: SYS.down, up: SYS.up, auto: true }]).map(n => `<div class="r" style="grid-template-columns:1fr 110px 110px"><span>${n.auto ? "<b class='orange'>● </b>" : ""}${esc(String(n.name).toUpperCase())}</span><span>▼ ${fmtRate(n.down)}</span><span>▲ ${fmtRate(n.up)}</span></div>`).join("")}</div></div></div>`;
   drawNetBig();
 }
 function drawNetBig() {
@@ -172,7 +172,7 @@ function dPress(c) {
 /* ---------- Audio ---------- */
 function dAudio(c) {
   c.innerHTML = `<div style="display:flex;flex-direction:column;gap:12px;height:100%"><div class="card" style="flex:1;display:flex;flex-direction:column"><div class="ct"><span>SPECTRUM</span><span id="daS">${audioLive() ? "LIVE" : "NO SIGNAL"}</span></div><div style="flex:1;position:relative"><canvas id="daC"></canvas></div></div>
-    <div class="micro">LIVELY DELIVERS A MONO SPECTRUM OF THE SYSTEM AUDIO · L AND R SHOW THE SAME LEVEL</div></div>`;
+    <div class="micro">${HOST} DELIVERS A MONO SPECTRUM OF THE SYSTEM AUDIO · L AND R SHOW THE SAME LEVEL</div></div>`;
 }
 function drawAudioBig() {
   const cv = $("daC"), f = cv && fitCanvas(cv); if (!f) return; const { x, W, H } = f, P = pal(), n = AUD.bins.length, bw = W / n;

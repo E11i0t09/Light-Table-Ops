@@ -49,7 +49,7 @@ const PANELS = [
     <div class="cv"><canvas id="cMini"></canvas></div>` },
   { id: "load", col: "B", prio: 5, h: 158, det: "sys", html: () => `
     <div class="row"><span class="tag">SYS LOAD</span><span class="lbl">FEED</span></div>
-    <div class="leg"><span><i></i>SENSOR</span><span><i class="g"></i>LIVELY ONLY</span><span id="ldSrc" class="cyan"></span></div>
+    <div class="leg"><span><i></i>SENSOR</span><span><i class="g"></i>${HOST_S} ONLY</span><span id="ldSrc" class="cyan"></span></div>
     <svg class="ga" id="ldG" viewBox="-110 -96 220 104"></svg>` },
   { id: "net", col: "B", prio: 6, h: 168, det: "net", html: () => `
     <div class="row"><span class="tag">NET LINK</span><span class="lbl">FEED</span></div>
@@ -165,7 +165,7 @@ function updSys() {
   g += `<text x="-100" y="6" font-size="8" fill="var(--dim)" letter-spacing="1">0</text><text x="100" y="6" font-size="8" fill="var(--dim)" text-anchor="end">100</text>
     <text x="0" y="-36" font-size="9" text-anchor="middle" letter-spacing="1"><tspan fill="var(--ye)">GPU ${Math.round(SYS.gpu)}</tspan><tspan fill="var(--dim)"> · </tspan><tspan fill="var(--cy)">RAM ${Math.round(SYS.ram)}</tspan></text>`;
   g += `<text x="0" y="-8" font-size="24" text-anchor="middle" fill="var(--tx)" font-weight="200">${Math.round(SYS.cpu)}<tspan font-size="11" fill="var(--dim)">%</tspan></text>
-    <text x="0" y="6" font-size="7" text-anchor="middle" fill="var(--dim)" letter-spacing="1.5">CPU · ${SYS.demo ? "DEMO" : (sensFresh() ? "SENSOR" : "LIVELY")}</text>`;
+    <text x="0" y="6" font-size="7" text-anchor="middle" fill="var(--dim)" letter-spacing="1.5">CPU · ${SYS.demo ? "DEMO" : (sensFresh() ? "SENSOR" : HOST_S)}</text>`;
   $("ldG").innerHTML = g; $("ldSrc").textContent = SYS.demo ? "DEMO" : "";
   // Netz-Ring
   const mx = Math.max(1, ...SYS.hist.down.slice(-120), SYS.down), mu = Math.max(1, ...SYS.hist.up.slice(-120), SYS.up);
@@ -178,7 +178,7 @@ function updSys() {
   $("ntK").innerHTML = `PK <b>${fmtRate(mx)}</b> / <b>${fmtRate(mu)}</b><br>SESSION ▼ <b>${fmtVol(SYS.sess.down)}</b><br>SESSION ▲ <b>${fmtVol(SYS.sess.up)}</b>`;
   $("ntA").textContent = (SYS.netName || "ADAPTER --").toUpperCase();
   $("ntM1").className = sensFresh() ? "on" : ""; $("ntM2").className = SYS.live && !SYS.demo ? "on" : ""; $("ntM3").className = SYS.down > 1e5 ? "on" : "";
-  $("ntM1").title = "SENSOR"; $("ntM2").title = "LIVELY"; $("ntM3").title = "ACTIVITY";
+  $("ntM1").title = "SENSOR"; $("ntM2").title = HOST_S; $("ntM3").title = "ACTIVITY";
   $("lkS").textContent = sensFresh() ? `SENSOR Nº ${CFG.sensorPort}` : (SENS.denied ? "SENSOR · DENIED" : "SENSOR · OFF");
 }
 function updUv() {

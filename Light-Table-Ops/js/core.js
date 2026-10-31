@@ -1,6 +1,8 @@
 /* Light Table Ops · © 2026 E11iot · CC BY-NC-ND 4.0
    core.js – Grundlagen: Hilfsfunktionen, Einstellungen, Speicher, Layout-Engine */
 "use strict";
+/* Laufzeit: Lively oder Wallpaper Engine (we-adapter.js setzt window.__WE) */
+const IS_WE = !!window.__WE, HOST = IS_WE ? "WALLPAPER ENGINE" : "LIVELY", HOST_S = IS_WE ? "WE" : "LIVELY";
 const $ = id => document.getElementById(id);
 const pad = (n, l = 2) => String(n).padStart(l, "0");
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));

@@ -64,7 +64,7 @@ function renderSys() {
   const P = pal();
   $("svC").textContent = Math.round(SYS.cpu); $("svG").textContent = Math.round(SYS.gpu); $("svR").textContent = Math.round(SYS.ram);
   $("svThr").textContent = cores.length; $("svCpuN").textContent = (SYS.cpuName || "CPU").toUpperCase(); $("svGpuN").textContent = (SYS.gpuName || "GPU").toUpperCase();
-  $("svNote").textContent = SYS.demo ? "DEMO VALUES · NO SYSTEM DATA" : (sensV2() ? "" : (sensFresh() ? "SENSOR < 2.0 · THREADS SIMULATED" : "SENSOR OFF · THREADS SIMULATED"));
+  $("svNote").textContent = SYS.demo ? (IS_WE ? "BRIDGE-OPS-SENSOR REQUIRED · DEMO VALUES" : "DEMO VALUES · NO SYSTEM DATA") : (sensV2() ? "" : (sensFresh() ? "SENSOR < 2.0 · THREADS SIMULATED" : "SENSOR OFF · THREADS SIMULATED"));
   $("svTT").textContent = sensV2() ? "BRIDGE-OPS-SENSOR " + SENS.data.ver : "SIMULATED";
   const sd = sensFresh() ? SENS.data : null, vr = sd && sd.vram;
   $("svGL").textContent = Math.round(SYS.gpu) + "%"; $("svGT").textContent = sd && sd.gpuTemp != null ? Math.round(sd.gpuTemp) + "°" : "--°";
