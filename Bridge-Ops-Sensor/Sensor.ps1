@@ -15,7 +15,7 @@
 param([int]$Port = 0, [switch]$Extended)
 
 $ErrorActionPreference = 'Stop'
-$Version = '2.1.1'
+$Version = '2.2.0'
 $script:UiDe = ((Get-UICulture).TwoLetterISOLanguageName -eq 'de')   # Sprache der Meldungen / message language
 function L([string]$textDe, [string]$textEn) { if ($script:UiDe) { $textDe } else { $textEn } }
 $Here    = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -35,6 +35,16 @@ if ($Port -le 0) {
   }
 }
 $OriginRx = '^https://[0-9a-f]{8,64}\.localhost$'
+# Wallpaper Engine lädt Web-Wallpaper als file:// (Origin "null"). Damit nicht jede beliebige Seite mitlesen kann,
+# braucht diese Herkunft einen Schlüssel (?k=...), den man im Wallpaper einträgt. / WE key for origin "null".
+$KeyFile = Join-Path $Here 'we-key.txt'
+$WeKey = ''
+try { if (Test-Path $KeyFile) { $WeKey = (Get-Content $KeyFile -Raw).Trim() } } catch { }
+if ($WeKey -notmatch '^[0-9a-f]{16}$') {
+  $rb = New-Object byte[] 8; [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($rb)
+  $WeKey = -join ($rb | ForEach-Object { $_.ToString('x2') })
+  try { Set-Content -Path $KeyFile -Value $WeKey -Encoding ASCII } catch { }
+}
 Log ("Start v$Version  Port=$Port  Extended=$([bool]$Extended)  Admin=" + ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) + "  User=$env:USERNAME  PS=$($PSVersionTable.PSVersion)")
 
 # ---------- nur eine Instanz ----------
@@ -448,7 +458,14 @@ function Serve-Pending {
       $origin = ''
       foreach ($line in $req -split "`r`n") { if ($line -imatch '^Origin:\s*(.+)$') { $origin = $Matches[1].Trim() } }
       $method = ($req -split ' ')[0]
-      if ($origin -match $OriginRx) {
+      $path = ($req -split ' ')[1]
+      $weOk = ($origin -eq 'null') -and ($path -match '[?&]k=([0-9a-f]{16})(&|$)') -and ($Matches[1] -eq $WeKey)
+      if ($weOk) {
+        if ($method -eq 'GET') { Send $st 200 'OK' $script:Json 'null' }
+        else { Send $st 405 'Method Not Allowed' '{"error":"method"}' 'null' }
+      } elseif ($origin -eq 'null') {
+        Send $st 403 'Forbidden' '{"error":"key"}' 'null'
+      } elseif ($origin -match $OriginRx) {
         if ($method -eq 'GET') { Send $st 200 'OK' $script:Json $origin }
         else { Send $st 405 'Method Not Allowed' '{"error":"method"}' $origin }
       } else {
@@ -495,6 +512,8 @@ if ($OnWin) {
     if ($script:Vram) { $it = New-Object System.Windows.Forms.ToolStripMenuItem(('VRAM  {0:N1} / {1:N0} GB' -f ($script:Vram.used / 1GB), ($script:Vram.total / 1GB))); $it.Enabled = $false; $menu.Items.Insert($idx, $it); [void]$diskItems.Add($it); $idx++ }
     $sep2 = New-Object System.Windows.Forms.ToolStripSeparator; $menu.Items.Insert($idx, $sep2); [void]$diskItems.Add($sep2)
   })
+  $iKey = $menu.Items.Add((L "Wallpaper-Engine-Schlüssel kopieren ($WeKey)" "Copy Wallpaper Engine key ($WeKey)"))
+  $iKey.add_Click({ try { [System.Windows.Forms.Clipboard]::SetText($WeKey); $tray.ShowBalloonTip(3000, 'Bridge-Ops-Sensor', (L 'Schlüssel kopiert – im Wallpaper unter "Sensor key" einfügen.' 'Key copied – paste it into the wallpaper setting "Sensor key".'), [System.Windows.Forms.ToolTipIcon]::Info) } catch { } })
   $quit = $menu.Items.Add((L 'Beenden' 'Quit'))
   $quit.add_Click({ [System.Windows.Forms.Application]::Exit() })
   $tray.ContextMenuStrip = $menu

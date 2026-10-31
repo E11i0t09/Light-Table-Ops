@@ -3,7 +3,7 @@
 
 Was ist das?
   Ein kleines PowerShell-Skript, das den Wallpapern "Bridge Ops" und "Light Table Ops" Werte liefert,
-  die Lively nicht kennt:
+  die Lively und Wallpaper Engine nicht kennen:
   - Belegung je internem Laufwerk (USB-Platten und Netzlaufwerke werden ausgelassen)
   - Lese-/Schreibrate je Laufwerk
   - Netzwerk-Durchsatz am Adapter, über den die Internetverbindung läuft
@@ -43,9 +43,16 @@ Beenden / Entfernen
 
 Sicherheit
   - Der Sensor ist nur auf diesem Rechner erreichbar (127.0.0.1), nicht aus dem Netzwerk.
-  - Er antwortet nur dem Wallpaper in Lively (Herkunft https://….localhost), Webseiten bekommen nichts.
+  - Er antwortet nur dem Wallpaper in Lively (Herkunft https://….localhost) oder mit Schlüssel in Wallpaper Engine; Webseiten bekommen nichts.
   - Er nimmt keine Befehle an, liest nur Messwerte und sendet nichts ins Internet.
   - Der Quelltext (Sensor.ps1) ist lesbar – gern vorher reinschauen.
+
+Wallpaper Engine (ab 2.2)
+  Wallpaper Engine öffnet Web-Wallpaper als lokale Datei. Damit trotzdem keine fremde Seite mitlesen kann,
+  braucht diese Verbindung einen Schlüssel:
+  1. Rechtsklick auf das Sensor-Symbol -> "Wallpaper-Engine-Schlüssel kopieren".
+  2. In Wallpaper Engine beim Wallpaper unter "Sensor key" einfügen.
+  Der Schlüssel steht auch in we-key.txt im Programmordner (löschen = beim nächsten Start neuer Schlüssel).
 
 Port ändern
   Standard ist 47047. Falls belegt: in "sensor.cfg" (im Ordner %LOCALAPPDATA%\Bridge-Ops-Sensor) z. B. Port=47048
@@ -60,7 +67,7 @@ Bridge-Ops-Sensor  (optional, Windows only)
 
 What is it?
   A small PowerShell script that gives the "Bridge Ops" and "Light Table Ops" wallpapers readings
-  Lively doesn't have:
+  Lively and Wallpaper Engine don't have:
   - usage per internal drive (USB disks and network drives are skipped)
   - read/write rate per drive
   - network throughput on the adapter that carries your internet connection
@@ -100,7 +107,7 @@ Quit / remove
 
 Security
   - The sensor is only reachable on this computer (127.0.0.1), not from the network.
-  - It only answers the wallpaper inside Lively (origin https://….localhost); websites get nothing.
+  - It only answers the wallpaper inside Lively (origin https://….localhost) or, with the key, in Wallpaper Engine; websites get nothing.
   - It accepts no commands, only reads measurements and sends nothing to the internet.
   - The source (Sensor.ps1) is plain text – feel free to have a look first.
 
@@ -110,3 +117,11 @@ Change the port
 
 Wallpaper shows "SENSOR: ACCESS DENIED"?
   Your Lively version still opens the wallpaper as a local file. Update Lively.
+
+Wallpaper Engine (since 2.2)
+  Wallpaper Engine opens web wallpapers as local files. So that no other page can read along,
+  this connection needs a key:
+  1. Right-click the sensor icon -> "Copy Wallpaper Engine key".
+  2. Paste it into the wallpaper's "Sensor key" setting in Wallpaper Engine.
+  The key is also in we-key.txt in the program folder (delete it = new key on next start).
+
