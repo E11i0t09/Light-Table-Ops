@@ -487,3 +487,4 @@ body[data-mode="strip"] .p-mmap .cv, body[data-mode="stripx"] .p-mmap .cv { min-
 .wv .l .rawb { flex: 0 1 auto; }
 .wv .l .dia { flex: 1 1 auto; height: auto; min-height: 170px; max-height: 520px; }
 .wv .sc .mid { flex: 3 1 0; }
+.su .wev, #setup .wev { flex: 1; font-size: 12px; letter-spacing: 1px; padding: 6px 8px; border: 1px dashed var(--ln2); color: var(--tx); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -108,9 +108,14 @@
       "Satellite (Esri, private use)"
     ]
   },
+  "hatch": {
+    "type": "checkbox",
+    "text": "Red range hatching on the map",
+    "value": true
+  },
   "place": {
     "type": "textbox",
-    "text": "Place (e.g. Hamburg \u2013 overrides the wizard, empty = unchanged)",
+    "text": "Place (e.g. Hamburg – overrides the wizard, empty = unchanged)",
     "value": ""
   },
   "adsbProxy": {
